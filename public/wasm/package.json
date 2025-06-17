@@ -1,0 +1,15 @@
+{
+  "name": "video-effects",
+  "type": "module",
+  "version": "0.1.0",
+  "files": [
+    "video_effects_bg.wasm",
+    "video_effects.js",
+    "video_effects.d.ts"
+  ],
+  "main": "video_effects.js",
+  "types": "video_effects.d.ts",
+  "sideEffects": [
+    "./snippets/*"
+  ]
+}
