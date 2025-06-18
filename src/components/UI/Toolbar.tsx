@@ -11,9 +11,13 @@ export const Toolbar: React.FC = () => {
         play,
         pause,
         setCurrentTime,
-        addItem,
+        addItemWithUndo,
         selectedItems,
-        deleteItem
+        deleteItemWithUndo,
+        undo,
+        redo,
+        canUndo,
+        canRedo
     } = useEditorStore();
 
     const handlePlayPause = () => {
@@ -42,41 +46,36 @@ export const Toolbar: React.FC = () => {
                 text: 'Sample Text',
                 fontSize: 24,
                 color: '#ffffff',
+                brightness: 1.0,
+                contrast: 1.0,
+                saturation: 1.0,
+                temperature: 0.0,
+                blur: 0.0,
             },
         };
-        addItem(newItem);
+        addItemWithUndo(newItem);
     };
 
     const handleDelete = () => {
-        selectedItems.forEach(id => deleteItem(id));
+        selectedItems.forEach(id => deleteItemWithUndo(id));
+    };
+
+    const handleUndo = () => {
+        undo();
+    };
+
+    const handleRedo = () => {
+        redo();
     };
 
     return (
         <div className="flex items-center justify-between h-full px-4">
             {/* Playback Controls */}
-            <div className="flex items-center space-x-2 ml-4">
-                <button
-                    // onClick={handleUndo}
-                    className="p-2 bg-gray-600 hover:bg-gray-700 rounded transition-colors disabled:opacity-50"
-                    disabled={true} // We'll implement this in the next phase
-                    title="Undo"
-                >
-                    <Undo size={16} />
-                </button>
-
-                <button
-                    // onClick={handleRedo}
-                    className="p-2 bg-gray-600 hover:bg-gray-700 rounded transition-colors disabled:opacity-50"
-                    disabled={true} // We'll implement this in the next phase
-                    title="Redo"
-                >
-                    <Redo size={16} />
-                </button>
-            </div>
             <div className="flex items-center space-x-2">
                 <button
                     onClick={handlePlayPause}
                     className="p-2 bg-blue-600 hover:bg-blue-700 rounded transition-colors"
+                    title={isPlaying ? 'Pause' : 'Play'}
                 >
                     {isPlaying ? <Pause size={20} /> : <Play size={20} />}
                 </button>
@@ -87,6 +86,7 @@ export const Toolbar: React.FC = () => {
                         setCurrentTime(0);
                     }}
                     className="p-2 bg-gray-600 hover:bg-gray-700 rounded transition-colors"
+                    title="Stop"
                 >
                     <Square size={20} />
                 </button>
@@ -94,6 +94,33 @@ export const Toolbar: React.FC = () => {
                 <div className="ml-4 text-sm">
                     {Math.floor(currentTime)}s
                 </div>
+            </div>
+
+            {/* Undo/Redo Controls */}
+            <div className="flex items-center space-x-2">
+                <button
+                    onClick={handleUndo}
+                    className={`p-2 rounded transition-colors ${canUndo()
+                            ? 'bg-gray-600 hover:bg-gray-700 text-white'
+                            : 'bg-gray-800 text-gray-500 cursor-not-allowed'
+                        }`}
+                    disabled={!canUndo()}
+                    title="Undo"
+                >
+                    <Undo size={16} />
+                </button>
+
+                <button
+                    onClick={handleRedo}
+                    className={`p-2 rounded transition-colors ${canRedo()
+                            ? 'bg-gray-600 hover:bg-gray-700 text-white'
+                            : 'bg-gray-800 text-gray-500 cursor-not-allowed'
+                        }`}
+                    disabled={!canRedo()}
+                    title="Redo"
+                >
+                    <Redo size={16} />
+                </button>
             </div>
 
             {/* Add Items */}
@@ -110,6 +137,7 @@ export const Toolbar: React.FC = () => {
                     <button
                         onClick={handleDelete}
                         className="p-2 bg-red-600 hover:bg-red-700 rounded transition-colors"
+                        title="Delete Selected"
                     >
                         <Trash2 size={16} />
                     </button>

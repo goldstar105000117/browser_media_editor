@@ -10,10 +10,10 @@ export const PropertiesPanel: React.FC = () => {
     const {
         scene,
         selectedItems,
-        updateItem,
-        deleteItem,
+        updateItemWithUndo,
+        deleteItemWithUndo,
         clearSelection,
-        addItem
+        addItemWithUndo
     } = useEditorStore();
 
     const selectedItem = selectedItems.length > 0
@@ -41,7 +41,12 @@ export const PropertiesPanel: React.FC = () => {
             updates[property] = value;
         }
 
-        updateItem(selectedItem.id, updates);
+        // Use undo-enabled update
+        updateItemWithUndo(selectedItem.id, updates);
+    };
+
+    const handleDelete = () => {
+        selectedItems.forEach(id => deleteItemWithUndo(id));
     };
 
     const handleDuplicate = () => {
@@ -57,11 +62,7 @@ export const PropertiesPanel: React.FC = () => {
             }
         };
 
-        addItem(newItem);
-    };
-
-    const handleDelete = () => {
-        selectedItems.forEach(id => deleteItem(id));
+        addItemWithUndo(newItem);
     };
 
     if (!selectedItem) {
