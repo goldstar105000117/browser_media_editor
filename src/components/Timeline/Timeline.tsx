@@ -30,11 +30,14 @@ export const Timeline: React.FC = () => {
         selectedItems,
         selectItem,
         updateItem,
-        clearSelection
+        clearSelection,
+        getContentDuration
     } = useEditorStore();
 
     const [activeId, setActiveId] = useState<string | null>(null);
     const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
+    const displayDuration = Math.max(getContentDuration(), 30);
+    const contentDuration = getContentDuration();
 
     const pixelsPerSecond = 50;
     const trackHeight = 60;
@@ -168,16 +171,24 @@ export const Timeline: React.FC = () => {
         <div className="h-full flex flex-col bg-gray-800">
             {/* Timeline Header */}
             <div className="h-8 bg-gray-700 border-b border-gray-600 relative flex-shrink-0">
-                {/* Time markers */}
-                {Array.from({ length: Math.ceil(scene.duration) + 1 }, (_, i) => (
+                {/* Time markers - use display duration for markers */}
+                {Array.from({ length: Math.ceil(displayDuration) + 1 }, (_, i) => (
                     <div
                         key={i}
-                        className="absolute top-0 h-full border-l border-gray-500 text-xs text-gray-300 pl-1 flex items-center"
+                        className={`absolute top-0 h-full border-l text-xs pl-1 flex items-center ${i <= contentDuration ? 'border-gray-500 text-gray-300' : 'border-gray-600 text-gray-500'
+                            }`}
                         style={{ left: `${i * pixelsPerSecond}px` }}
                     >
                         {i}s
                     </div>
                 ))}
+
+                {/* Content end indicator */}
+                <div
+                    className="absolute top-0 w-0.5 h-full bg-yellow-500 z-15 pointer-events-none"
+                    style={{ left: `${contentDuration * pixelsPerSecond}px` }}
+                    title={`Content ends at ${contentDuration.toFixed(1)}s`}
+                />
 
                 {/* Playhead */}
                 <div
@@ -192,6 +203,15 @@ export const Timeline: React.FC = () => {
                 className="flex-1 relative overflow-auto timeline-background"
                 onClick={handleTimelineClick}
             >
+                {/* Content area background */}
+                <div
+                    className="absolute top-0 bottom-0 bg-gray-750 pointer-events-none opacity-30"
+                    style={{
+                        left: 0,
+                        width: `${contentDuration * pixelsPerSecond}px`
+                    }}
+                />
+
                 <DndContext
                     sensors={sensors}
                     onDragStart={handleDragStart}
@@ -218,10 +238,11 @@ export const Timeline: React.FC = () => {
                         {/* Grid lines for visual feedback */}
                         <div className="absolute inset-0 pointer-events-none">
                             {/* Vertical grid lines (time) */}
-                            {Array.from({ length: Math.ceil(scene.duration * 2) }, (_, i) => (
+                            {Array.from({ length: Math.ceil(displayDuration * 2) }, (_, i) => (
                                 <div
                                     key={`vline-${i}`}
-                                    className="absolute top-0 bottom-0 border-l border-gray-700 opacity-30"
+                                    className={`absolute top-0 bottom-0 border-l opacity-30 ${(i * 0.5) <= contentDuration ? 'border-gray-700' : 'border-gray-800'
+                                        }`}
                                     style={{ left: `${(i * 0.5) * pixelsPerSecond}px` }}
                                 />
                             ))}

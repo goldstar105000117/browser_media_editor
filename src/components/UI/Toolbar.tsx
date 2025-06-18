@@ -17,8 +17,11 @@ export const Toolbar: React.FC = () => {
         undo,
         redo,
         canUndo,
-        canRedo
+        canRedo,
+        getContentDuration
     } = useEditorStore();
+
+    const contentDuration = getContentDuration();
 
     const handlePlayPause = () => {
         if (isPlaying) {
@@ -91,8 +94,20 @@ export const Toolbar: React.FC = () => {
                     <Square size={20} />
                 </button>
 
-                <div className="ml-4 text-sm">
-                    {Math.floor(currentTime)}s
+                {/* Enhanced time display */}
+                <div className="ml-4 text-sm space-x-2">
+                    <span className="text-white">
+                        {currentTime.toFixed(1)}s
+                    </span>
+                    <span className="text-gray-400">/</span>
+                    <span className="text-gray-300">
+                        {contentDuration.toFixed(1)}s
+                    </span>
+                </div>
+
+                {/* Content duration indicator */}
+                <div className="ml-2 px-2 py-1 bg-gray-800 rounded text-xs text-gray-400">
+                    Content: {contentDuration.toFixed(1)}s
                 </div>
             </div>
 
@@ -101,8 +116,8 @@ export const Toolbar: React.FC = () => {
                 <button
                     onClick={handleUndo}
                     className={`p-2 rounded transition-colors ${canUndo()
-                            ? 'bg-gray-600 hover:bg-gray-700 text-white'
-                            : 'bg-gray-800 text-gray-500 cursor-not-allowed'
+                        ? 'bg-gray-600 hover:bg-gray-700 text-white'
+                        : 'bg-gray-800 text-gray-500 cursor-not-allowed'
                         }`}
                     disabled={!canUndo()}
                     title="Undo"
@@ -113,8 +128,8 @@ export const Toolbar: React.FC = () => {
                 <button
                     onClick={handleRedo}
                     className={`p-2 rounded transition-colors ${canRedo()
-                            ? 'bg-gray-600 hover:bg-gray-700 text-white'
-                            : 'bg-gray-800 text-gray-500 cursor-not-allowed'
+                        ? 'bg-gray-600 hover:bg-gray-700 text-white'
+                        : 'bg-gray-800 text-gray-500 cursor-not-allowed'
                         }`}
                     disabled={!canRedo()}
                     title="Redo"

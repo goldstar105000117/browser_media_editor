@@ -9,6 +9,7 @@ import {
 } from '@/lib/commands/Command';
 
 interface EditorStore extends EditorState {
+    [x: string]: any;
     // Command system
     commandManager: CommandManager;
 
@@ -58,7 +59,8 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
 
     // Basic actions
     setCurrentTime: (time: number) => {
-        const newTime = Math.max(0, Math.min(time, get().scene.duration));
+        const contentDuration = get().getContentDuration();
+        const newTime = Math.max(0, Math.min(time, contentDuration));
         set({ currentTime: newTime });
     },
 
@@ -74,24 +76,41 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
         set({ selectedItems: [] });
     },
 
-    // Playback controls
+    getContentDuration: () => {
+        const { scene } = get();
+        if (scene.items.length === 0) return scene.duration; // Use default if no items
+
+        // Find the latest end time of all items
+        const latestEndTime = Math.max(
+            ...scene.items.map(item => item.startTime + item.duration)
+        );
+
+        // Add a small buffer (1 second) after the last item
+        return Math.max(latestEndTime + 1, 5); // Minimum 5 seconds
+    },
+
     play: () => {
         if (playbackInterval) {
             clearInterval(playbackInterval);
         }
 
         set({ isPlaying: true });
+        console.log('▶️ Starting playback');
 
         playbackInterval = setInterval(() => {
             const state = get();
             if (state.isPlaying) {
                 const newTime = state.currentTime + 0.1;
-                if (newTime >= state.scene.duration) {
+                const contentDuration = state.getContentDuration();
+
+                if (newTime >= contentDuration) {
+                    // Stop at end of actual content
+                    console.log(`⏹️ Reached end of content at ${contentDuration.toFixed(1)}s`);
                     if (playbackInterval) {
                         clearInterval(playbackInterval);
                         playbackInterval = null;
                     }
-                    set({ isPlaying: false, currentTime: 0 });
+                    set({ isPlaying: false, currentTime: contentDuration });
                 } else {
                     set({ currentTime: newTime });
                 }
