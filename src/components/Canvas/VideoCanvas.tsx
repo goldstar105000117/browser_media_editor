@@ -119,7 +119,8 @@ export const VideoCanvas: React.FC = () => {
         }
 
         if (clickedItem) {
-            selectItem(clickedItem.id);
+            selectItem(clickedItem.id); // This will auto-focus to the item's start time
+            console.log(`🎯 Selected and focused: ${clickedItem.type} at ${clickedItem.startTime}s`);
         } else {
             clearSelection();
         }

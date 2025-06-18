@@ -13,7 +13,9 @@ export const PropertiesPanel: React.FC = () => {
         updateItemWithUndo,
         deleteItemWithUndo,
         clearSelection,
-        addItemWithUndo
+        addItemWithUndo,
+        keepSelectedItemInView,
+        setCurrentTime
     } = useEditorStore();
 
     const selectedItem = selectedItems.length > 0
@@ -43,6 +45,9 @@ export const PropertiesPanel: React.FC = () => {
 
         // Use undo-enabled update
         updateItemWithUndo(selectedItem.id, updates);
+
+        // Keep the item in view after editing
+        keepSelectedItemInView();
     };
 
     const handleDelete = () => {
@@ -110,6 +115,32 @@ export const PropertiesPanel: React.FC = () => {
                 <div className="text-sm text-gray-300 mt-2 mb-1">ID</div>
                 <div className="text-xs text-gray-400 font-mono">{selectedItem.id}</div>
             </div>
+            <div className="mb-6 p-3 bg-gray-800 rounded">
+                <div className="text-sm text-gray-300 mb-2">Quick Actions</div>
+                <div className="flex space-x-2">
+                    <button
+                        onClick={() => setCurrentTime(selectedItem.startTime)}
+                        className="px-3 py-1 bg-blue-600 hover:bg-blue-700 rounded text-xs transition-colors"
+                        title="Jump to start"
+                    >
+                        ⏮ Start
+                    </button>
+                    <button
+                        onClick={() => setCurrentTime(selectedItem.startTime + selectedItem.duration / 2)}
+                        className="px-3 py-1 bg-blue-600 hover:bg-blue-700 rounded text-xs transition-colors"
+                        title="Jump to middle"
+                    >
+                        ⏸ Middle
+                    </button>
+                    <button
+                        onClick={() => setCurrentTime(selectedItem.startTime + selectedItem.duration)}
+                        className="px-3 py-1 bg-blue-600 hover:bg-blue-700 rounded text-xs transition-colors"
+                        title="Jump to end"
+                    >
+                        ⏭ End
+                    </button>
+                </div>
+            </div>F
 
             {/* Transform Properties */}
             <div className="mb-6">

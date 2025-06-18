@@ -167,21 +167,26 @@ export const Timeline: React.FC = () => {
 
     const activeItem = activeId ? scene.items.find(item => item.id === activeId) : null;
 
+    const selectedItem = selectedItems.length > 0
+        ? scene.items.find(item => item.id === selectedItems[0])
+        : null;
+
     return (
         <div className="h-full flex flex-col bg-gray-800">
             {/* Timeline Header */}
             <div className="h-8 bg-gray-700 border-b border-gray-600 relative flex-shrink-0">
-                {/* Time markers - use display duration for markers */}
-                {Array.from({ length: Math.ceil(displayDuration) + 1 }, (_, i) => (
+                {/* ... existing time markers ... */}
+
+                {/* Selected item duration highlight */}
+                {selectedItem && (
                     <div
-                        key={i}
-                        className={`absolute top-0 h-full border-l text-xs pl-1 flex items-center ${i <= contentDuration ? 'border-gray-500 text-gray-300' : 'border-gray-600 text-gray-500'
-                            }`}
-                        style={{ left: `${i * pixelsPerSecond}px` }}
-                    >
-                        {i}s
-                    </div>
-                ))}
+                        className="absolute top-0 h-full bg-blue-500 opacity-20 pointer-events-none z-5"
+                        style={{
+                            left: `${selectedItem.startTime * pixelsPerSecond}px`,
+                            width: `${selectedItem.duration * pixelsPerSecond}px`
+                        }}
+                    />
+                )}
 
                 {/* Content end indicator */}
                 <div

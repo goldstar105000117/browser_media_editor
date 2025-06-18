@@ -65,7 +65,33 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
     },
 
     selectItem: (id: string) => {
+        const { scene, setCurrentTime } = get();
+        const item = scene.items.find(item => item.id === id);
+
         set({ selectedItems: [id] });
+
+        // Auto-focus: Jump timeline to show the selected item
+        if (item) {
+            // Jump to the start of the selected item
+            setCurrentTime(item.startTime);
+            console.log(`🎯 Focused on ${item.type} at ${item.startTime}s`);
+        }
+    },
+
+    keepSelectedItemInView: () => {
+        const { selectedItems, scene, currentTime } = get();
+        if (selectedItems.length === 0) return;
+
+        const selectedItem = scene.items.find(item => item.id === selectedItems[0]);
+        if (!selectedItem) return;
+
+        const itemStart = selectedItem.startTime;
+        const itemEnd = selectedItem.startTime + selectedItem.duration;
+
+        // If current time is outside the item's range, jump to item start
+        if (currentTime < itemStart || currentTime > itemEnd) {
+            get().setCurrentTime(itemStart);
+        }
     },
 
     selectMultiple: (ids: string[]) => {
