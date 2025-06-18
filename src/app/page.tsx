@@ -46,7 +46,7 @@ export default function Home() {
       </div>
 
       {/* Main Content */}
-      <div className="flex-1 flex">
+      <div className="flex-1 flex overflow-hidden">
         {/* Canvas Area */}
         <div className="flex-1 flex items-center justify-center bg-gray-800 relative">
           <VideoCanvas />
